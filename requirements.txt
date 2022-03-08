@@ -1,2 +1,0 @@
-python-dotenv==0.19.2
-instapy==0.6.14
