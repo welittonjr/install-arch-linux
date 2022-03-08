@@ -8,6 +8,30 @@
 + [Preparar instalação]()
     + [Particionar o disco](#partdisk)
     + [Formatar partições](#partformt)
+    + [Criar pastas para montagem](#createdir)
+    + [Realizar montagem de partições](#mount)
++ [Alterar mirror](#updatemirror)
++ [Instalação de base](#install)
++ [Gerar fstab](#gfstab)
++ [Configurando ambiente arch]()
+    + [Usando arch-chroot](#arch-chroot)
+    + [Definindo fuso horario](#sethours)
+    + [Atualizar o relogio](#updateclock)
+    + [Adicionando tradução](#translate)
+    + [Definir variavel de ambiente com tradução](#setenvtranslate)
+    + [Definir teclado no sistema](#setkeybordsystem)
+    + [Definir hostname](#sethostname)
+    + [Definir o ip da maquina interna](#sethosts)
+    + [Definir senha usuario root](#password)
+    + [Criando usuario comum](#createuser)
++ [Instalação de pacotes](#install-apps)
++ [Adicionando usuario ao grupo sudo](#usersudo)
++ [Install Grub](#grub)
++ [Finalizar Instalação]()
+    + [Sair do chroot](#exitchroot)
+    + [Desmontando estrutura archlinux](#umount)
+    + [Reiniciar o arch](#shutdown)
+    
 
 ## <a name="setkeyboard"></a> Definição de teclado
 Lista de layout de teclado
@@ -45,8 +69,9 @@ cfdisk /dev/sda
 |Sevice   |Size |Type            |
 |---------|-----|----------------|
 |/dev/sda1|500M |BIOS boot       |
-|/dev/sda2|     |linux filesystem|
-|         |     |                |
+|/dev/sda2|     |Linux Filesystem|
+|/dev/sda3|     |Linux Filesystem|
+|/dev/sda4|     |Linux Swap      |
 
 *Write and Quit*
 
@@ -56,56 +81,69 @@ fdisk -l /dev/sda
 
 ## <a name="partformt"></a> Formatar partições
 ```bash
-# primeiro o BIOS boot
 mkfs.fat -F32 /dev/sda1
-# depois
+```
+```bash
 mkfs.ext4 /dev/sda2
 ```
-
-## montar a partição raiz
 ```bash
-mount /dev/sda2 /mnt/
+mkfs.ext4 /dev/sda3
+```
+```bash
+mkfswap /dev/sda4
 ```
 
-## instalação do archlinux e bases
+## <a name="createdir"></a> Criar pastas para montagem
+```bash
+mkdir /mnt/{boot,home}
+```
+
+## <a name="mount"></a> Montar a partição raiz
+```bash
+mount /dev/sda1 /mnt/boot/efi
+mount /dev/sda2 /mnt
+mount /dev/sda3 /mnt/home
+swapon /dev/sda4
+```
+
+## <a name="updatemirror"></a> Alterar mirror
+```bash
+cat /etc/pacman.d/mirrorlist
+```
+
+## <a name="install"></a> Instalação do archlinux e bases
 ```bash
 pacstrap /mnt base base-devel linux linux-firmware
 ```
 
-## fstab
+## <a name="gfstab"></a> Gerar fstab
 ```bash
 genfstab -U /mnt >> /mnt/etc/fstab
 cat /mnt/etc/fstab
 ```
 
-## chroot
+## <a name="arch-chroot"></a> Usando arch-chroot
 ```bash
 arch-chroot /mnt /bin/bash
 ```
-
-## instalando apps
+## <a name="sethours"></a> Definindo fuso horario
 ```bash
-pacman -S vim nano networkmanager
-```
-
-## definindo fuso horario
-```bash
-ln -sf /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime
+ln -sf /usr/share/zoneinfo/America/Belem /etc/localtime
 ls -l /etc/localtime
 ```
 
-## atualizar o relogio
+## <a name="updateclock"></a> Atualizar o relogio
 ```bash
 hwclock --systohc
 ```
 
-## adicionando tradução
+## <a name="translate"></a> Adicionando tradução
+definir **pt_BR.UTF-8 UTF-8**
 ```bash
 nano /etc/locale.gen
 ```
-definir **pt_BR.UTF-8 UTF-8**
 
-## Definir variavel de ambiente
+## <a name="setenvtranslate"></a> Definir variavel de ambiente com tradução 
 ```bash
 nano /etc/locale.conf
 ```
@@ -117,7 +155,16 @@ carregar a tradução do sistema
 ```bash
 locale-gen
 ```
-## Definir o nome da máquina
+
+## <a name="setkeybordsystem"></a> Definir teclado no sistema
+```bash
+nano /etc/vconsole.conf
+```
+```bash
+export KEYMAP="br-abnt2"
+```
+
+## <a name="sethostname"></a> Definir o nome da máquina
 ```bash
 nano /etc/hostname
 ```
@@ -125,7 +172,8 @@ ex:
 ```bash
 arch
 ```
-## Definir o ip da maquina interna
+
+## <a name="sethosts"></a> Definir o ip da maquina interna
 ```bash
 nano /etc/hosts
 
@@ -134,32 +182,45 @@ nano /etc/hosts
 127.0.0.1 arch.localdomain arch
 ```
 
-## Definir password do usuário root
+## <a name="password"></a> Definir password do usuário root
 ```bash
 passwd
 ```
 
-## Instalar o GRUB
+## <a name="createuser"></a> Criand usuário comum
 ```bash
-pacman -S grub
-pacman -S os-prober
+useradd -m -g users -G wheel wellington
+```
+
+## <a name="install-apps"></a> instalando Apps
+```bash
+pacman -S dosfstools os-prober mtools nano network-manager-applet networkmanager grub
+wpa_supplicant wireless_tools sudo dialog
+```
+
+## <a name="usersudo"></a> Adicionar usuario no grupo sudo
+```bash
+nano /etc/sudoers
+```
+definir nome do usuário
+wellington ALL=(ALL)ALL
+## <a name="grub"></a> Instalar o GRUB
+```bash
 grub-install /dev/sda
 grub-mkconfig -o /boot/grub/grub.cfg 
 ```
-## Adicionar usuario
 
-## Sair do chroot
+## <a name="exitchroot"></a> Sair do chroot
 ```bash
 exit 0
 ```
 
-
-## Desmontando estrutura archlinux
+## <a name="umount"></a> Desmontando estrutura archlinux
 ```bash
 umount -R /mnt
 ```
 
-## Reiniciar o arch
+## <a name="shutdown"></a> Reiniciar o arch
 ```bash
 shutdown -h now
 ```
