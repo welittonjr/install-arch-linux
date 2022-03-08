@@ -1,6 +1,6 @@
 # Instalação do Arch Linux
 
-# [Início]()
++ [Início]()
 + [Configurações iniciais]()
     + [Definição de teclado](#setkeyboard)
     + [Conexão com a internet](#checknetwork)
@@ -9,7 +9,7 @@
     + [Particionar o disco](#partdisk)
     + [Formatar partições](#partformt)
 
-## <a hre="setkeyboard"></a> Definição de teclado
+## <a name="setkeyboard"></a> Definição de teclado
 Lista de layout de teclado
 ```bash
 $ ls /usr/share/kbd/keymaps/**/*.map.gz | grep br
@@ -19,7 +19,7 @@ Definir teclado
 $ loadkeys br-abnt2
 ```
 
-## <a hre="checknetwork"></a> Conexão com a internet
+## <a name="checknetwork"></a> Conexão com a internet
 ver as interfaces de reder
 ```bash
 ip addr show
@@ -29,7 +29,7 @@ com wifi
 wifi-menu
 ```
 
-## <a hre="checkdisk"></a> verificando os dicos
+## <a name="checkdisk"></a> verificando os dicos
 ```bash
 lsblk
 ```
@@ -37,7 +37,7 @@ lsblk
 fdisk -l
 ```
 
-## <a hre="partdisk"></a> Particionar o disco
+## <a name="partdisk"></a> Particionar o disco
 ```bash
 cfdisk /dev/sda
 ```
@@ -54,7 +54,7 @@ cfdisk /dev/sda
 fdisk -l /dev/sda
 ```
 
-## <a hre="partformt"></a> Formatar partições
+## <a name="partformt"></a> Formatar partições
 ```bash
 # primeiro o BIOS boot
 mkfs.fat -F32 /dev/sda1
