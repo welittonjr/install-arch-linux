@@ -220,7 +220,7 @@ exit 0
 umount -R /mnt
 ```
 
-## <a name="shutdown"></a> Reiniciar o arch
+## <a name="shutdown"></a> Reiniciar o Arch
 ```bash
 shutdown -h now
 ```
